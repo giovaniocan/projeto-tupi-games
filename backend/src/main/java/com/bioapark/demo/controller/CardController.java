@@ -1,4 +1,4 @@
-package com.bioapark.demo.cotroller;
+package com.bioapark.demo.controller;
 
 import com.bioapark.demo.model.Card;
 import com.bioapark.demo.service.CardService;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/cards")
+@RequestMapping("/api/cards")
 @CrossOrigin(origins = "*")
 public class CardController {
 

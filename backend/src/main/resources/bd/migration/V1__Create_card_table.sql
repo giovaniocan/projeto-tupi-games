@@ -1,0 +1,7 @@
+CREATE TABLE cards (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nome_portugues VARCHAR(100) NOT NULL,
+    nome_tupi VARCHAR(100) NOT NULL,
+    imagem_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
