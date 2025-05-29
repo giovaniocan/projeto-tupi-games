@@ -5,6 +5,8 @@ CREATE TABLE scores (
                         score_value INT NOT NULL,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
 /*Busca top 10 scores*/
 
 CREATE INDEX idx_score_value ON scores (score_value DESC);
