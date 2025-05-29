@@ -5,3 +5,4 @@ CREATE TABLE cards (
     imagem_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
