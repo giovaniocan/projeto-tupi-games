@@ -1,0 +1,138 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  height: 100%;
+}
+
+.ranking-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url('/background.png') no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 0;
+  position: relative;
+}
+
+.back-button {
+  background-color: #f9c441;
+  border: none;
+  border-radius: 15px;
+  padding: 8px 20px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s;
+}
+
+.back-button:hover {
+  background-color: #f1b933;
+}
+
+.ranking-container {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 25px;
+  width: 90%;
+  max-width: 800px;
+  min-height: 350px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.ranking-title {
+  text-align: center;
+  color: #2ea643;
+  font-size: 32px;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.ranking-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ranking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  font-weight: bold;
+  font-size: 20px;
+  color: #444;
+  margin-bottom: 5px;
+  gap: 6%;
+}
+
+.ranking-header span {
+  width: 47%;
+  text-align: center;
+}
+
+.ranking-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  gap: 6%;
+  flex-wrap: wrap;
+}
+
+.player-name,
+.player-score {
+  width: 47%;
+  background-color: #76d7fa;
+  color: white;
+  padding: 10px 25px;
+  border-radius: 25px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 15px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.player-score {
+  background-color: #f9c441;
+  color: #333;
+}
+
+/* RESPONSIVO */
+@media (max-width: 600px) {
+  .ranking-header {
+    font-size: 16px;
+    padding: 0 10px;
+  }
+
+  .ranking-header span {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  .ranking-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .player-name,
+  .player-score {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .ranking-title {
+    font-size: 26px;
+  }
+
+  .ranking-container {
+    padding: 15px;
+  }
+}

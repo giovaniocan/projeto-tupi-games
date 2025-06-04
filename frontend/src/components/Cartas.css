@@ -1,0 +1,21 @@
+.cartas {
+  width: 60px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ccc;
+  border: 2px solid #999;
+  border-radius: 4px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cartas:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

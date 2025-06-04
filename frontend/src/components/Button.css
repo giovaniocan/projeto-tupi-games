@@ -1,0 +1,61 @@
+/* components/Button.css */
+.button {
+  width: 100%;
+  padding: 0.5rem 0;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.button-green {
+  background-color: #22c55e;
+}
+
+.button-green:hover {
+  background-color: #16a34a;
+}
+
+.button-blue {
+  background-color: #60a5fa;
+}
+
+.button-blue:hover {
+  background-color: #3b82f6;
+}
+
+.button-yellow {
+  background-color: #facc15;
+}
+
+.button-yellow:hover {
+  background-color: #eab308;
+}
+
+.button-brown {
+  background-color: #b45309;
+}
+
+.button-brown:hover {
+  background-color: #92400e;
+}
+
+/* Media queries para responsividade */
+@media screen and (max-width: 48rem) { /* 768px */
+  .button {
+    padding: 0.6rem 0; /* Botões maiores em telas menores para facilitar toque */
+    font-size: 1.1rem;
+  }
+}
+
+@media screen and (max-width: 30rem) { /* 480px */
+  .button {
+    padding: 0.75rem 0; /* Ainda maiores em telas muito pequenas */
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+  }
+}
