@@ -1,14 +1,15 @@
-// App.tsx
 import { AppRoutes } from "./routes";
-import { BackgroundImage } from './components/BackgroundImage';
+import { Background } from './components/Background';
+import { AudioToggle } from './components/AudioToggle';
 import { LanguageProvider } from './languageContext';
 
 function App() {
   return (
     <LanguageProvider>
       <div className="min-h-screen">
-        <BackgroundImage />
-        <img src="./assets/imagemFundo.png" alt="" />
+        <Background children={undefined} />
+
+        <AudioToggle />
         <div className="relative z-10 min-h-screen">
           <AppRoutes />
         </div>
@@ -18,3 +19,4 @@ function App() {
 }
 
 export default App;
+

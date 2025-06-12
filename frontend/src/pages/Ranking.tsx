@@ -1,113 +1,68 @@
-// frontend/src/pages/Ranking.tsx
-import React, { useState, useEffect } from "react";
-import "./Ranking.css";
-import { useNavigate } from "react-router-dom";
-import { ScoreService } from "../services/scoreService";
-import { Score } from "../types/backend-types";
+import React from 'react';
+// Importa o arquivo CSS com os estilos específicos para o componente
+import './Ranking.css';
+// Importa o hook 'useNavigate' do React Router para navegação programática entre páginas
+import { useNavigate } from 'react-router-dom';
+
+// Define o tipo (interface) dos dados de um jogador
+type Player = {
+  name: string;
+  score: number;
+  time: string;
+};
 
 export const Ranking: React.FC = () => {
+  // Hook usado para redirecionar o usuário para outra rota (página)
   const navigate = useNavigate();
-  const [players, setPlayers] = useState<Score[]>([]);
-  const [carregando, setCarregando] = useState<boolean>(true);
-  const [erro, setErro] = useState<string>("");
 
-  // Carrega os scores quando o componente monta
-  useEffect(() => {
-    const carregarRanking = async () => {
-      setCarregando(true);
-      setErro("");
+  // Lista de jogadores com nome, pontuação e tempo — usada para simular dados dinâmicos
+  const players: Player[] = [
+    { name: 'FULANO 1', score: 888888, time: '01:30:04' },
+    { name: 'FULANO 2', score: 777777, time: '01:30:04' },
+    { name: 'FULANO 3', score: 555555, time: '01:30:04' },
+    { name: 'FULANO 4', score: 222222, time: '01:30:04' },
+    { name: 'FULANO 5', score: 111111, time: '01:30:04' },
+    { name: 'FULANO 6', score: 0, time: '01:30:04' },
+  ];
 
-      try {
-        console.log("🏆 Carregando ranking...");
-        const top10 = await ScoreService.getTop10Scores();
-        setPlayers(top10);
-        console.log(`✅ Ranking carregado com ${top10.length} scores`);
-      } catch (error: any) {
-        console.error("❌ Erro ao carregar ranking:", error);
-        setErro("Erro ao carregar ranking. Usando dados locais.");
-      } finally {
-        setCarregando(false);
-      }
-    };
+const handleBack = () => {
+  navigate("/home"); //navega a pagina home
+};
 
-    carregarRanking();
-  }, []);
-
-  const formatarTempo = (createdAt?: string): string => {
-    if (!createdAt) return "00:00:00";
-
-    try {
-      const data = new Date(createdAt);
-      return data.toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-    } catch {
-      return "00:00:00";
-    }
-  };
-
-  const formatarScore = (score: number): string => {
-    return score.toString().padStart(7, "0");
-  };
-
-  const handleBack = () => {
-    navigate(-1); // Navega para a página anterior
-  };
-
+  // JSX que renderiza o componente na tela
   return (
     <div className="ranking-wrapper">
-      <button className="back-button" onClick={handleBack}>
+      {}
+         <button className="btn-voltar" onClick={() => navigate('/')}>
+        {}
         Voltar
       </button>
 
+      {/* Card principal */}
       <div className="ranking-container">
         <h1 className="ranking-title">Ranking</h1>
 
-        {/* Loading state */}
-        {carregando && (
-          <div className="ranking-loading">
-            <p>🏆 Carregando ranking...</p>
-            <p>Conectando com o servidor...</p>
+        {/* Tabela visual do ranking com cabeçalho e jogadores */}
+        <div className="ranking-table">
+          <div className="ranking-header">
+            {/* Cabeçalhos das colunas: Nome e Pontuação */}
+            <span>Nome</span>
+            <span>Score</span>
           </div>
-        )}
 
-        {/* Error state */}
-        {erro && (
-          <div className="ranking-error">
-            <p>⚠️ {erro}</p>
-          </div>
-        )}
-
-        {/* Ranking table */}
-        {!carregando && (
-          <div className="ranking-table">
-            <div className="ranking-header">
-              <span>Nome</span>
-              <span>Score</span>
-            </div>
-
-            {players.length === 0 ? (
-              <div className="ranking-empty">
-                <p>🎮 Nenhum score encontrado ainda!</p>
-                <p>Seja o primeiro a jogar e aparecer no ranking!</p>
+          {/* Renderiza dinamicamente cada jogador da lista */}
+          {players.map((player, index) => (
+            <div className="ranking-row" key={index}>
+              {/* Nome do jogador */}
+              <div className="player-name">{player.name}</div>
+              {/* Pontuação*/}
+              <div className="player-score">
+                PONTOS: {player.score.toString().padStart(7, '0')} &nbsp;&nbsp;
+                TEMPO: {player.time}
               </div>
-            ) : (
-              players.map((player, index) => (
-                <div className="ranking-row" key={player.id || index}>
-                  <div className="player-name">
-                    #{index + 1} {player.playerName}
-                  </div>
-                  <div className="player-score">
-                    PONTOS: {formatarScore(player.scoreValue)} &nbsp;&nbsp;
-                    HORA: {formatarTempo(player.createdAt)}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

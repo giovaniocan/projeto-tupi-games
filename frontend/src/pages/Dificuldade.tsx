@@ -26,17 +26,17 @@ export const Dificuldade = () => {
           {
             text: t('difficulty', 'easy') + ' (4X4)',
             color: 'green',
-            onClick: () => handleClick('Facil'),
+            onClick: () => handleClick('Fácil'),
           },
           {
             text: t('difficulty', 'medium') + ' (4X6)',
             color: 'blue',
-            onClick: () => handleClick('Medio'),
+            onClick: () => handleClick('Médio'),
           },
           {
             text: t('difficulty', 'hard') + ' (5X6)',
             color: 'brown',
-            onClick: () => handleClick('Dificil'),
+            onClick: () => handleClick('Difícil'),
           },
         ]}
       />
