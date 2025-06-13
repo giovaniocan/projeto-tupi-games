@@ -1,8 +1,9 @@
+version: "3.8"
+
 services:
-  # Banco de dados MySQL
   mysql-db:
     image: mysql:8.0
-    container_name: mysql-container
+    container_name: tupi-games-mysql
     restart: always
     environment:
       MYSQL_DATABASE: tupi-games
@@ -11,21 +12,19 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      # - ./bd/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - app-network
+      - tupi-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
-  # Backend Spring Boot - COMENTADO PARA DESENVOLVIMENTO LOCAL
-  # Descomente quando quiser rodar tudo containerizado
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: backend-container
+    container_name: tupi-games-backend
     restart: always
     ports:
       - "8080:8080"
@@ -38,11 +37,24 @@ services:
       mysql-db:
         condition: service_healthy
     networks:
-      - app-network
+      - tupi-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: tupi-games-frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - tupi-network
 
 volumes:
   mysql_data:
 
 networks:
-  app-network:
+  tupi-network:
     driver: bridge
