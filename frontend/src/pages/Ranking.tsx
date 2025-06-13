@@ -1,68 +1,163 @@
-import React from 'react';
-// Importa o arquivo CSS com os estilos específicos para o componente
-import './Ranking.css';
-// Importa o hook 'useNavigate' do React Router para navegação programática entre páginas
-import { useNavigate } from 'react-router-dom';
-
-// Define o tipo (interface) dos dados de um jogador
-type Player = {
-  name: string;
-  score: number;
-  time: string;
-};
+import React, { useEffect, useState } from "react";
+import "./Ranking.css";
+import { useNavigate } from "react-router-dom";
+import { ScoreService } from "../services/scoreService";
+import { Score } from "../types/backend-types";
 
 export const Ranking: React.FC = () => {
-  // Hook usado para redirecionar o usuário para outra rota (página)
   const navigate = useNavigate();
+  const [players, setPlayers] = useState<Score[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Lista de jogadores com nome, pontuação e tempo — usada para simular dados dinâmicos
-  const players: Player[] = [
-    { name: 'FULANO 1', score: 888888, time: '01:30:04' },
-    { name: 'FULANO 2', score: 777777, time: '01:30:04' },
-    { name: 'FULANO 3', score: 555555, time: '01:30:04' },
-    { name: 'FULANO 4', score: 222222, time: '01:30:04' },
-    { name: 'FULANO 5', score: 111111, time: '01:30:04' },
-    { name: 'FULANO 6', score: 0, time: '01:30:04' },
-  ];
+  useEffect(() => {
+    const buscarRanking = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log("🏆 Buscando ranking do backend...");
 
-const handleBack = () => {
-  navigate("/home"); //navega a pagina home
-};
+        const rankingData = await ScoreService.getTop10Scores();
+        console.log("📊 Ranking recebido:", rankingData);
 
-  // JSX que renderiza o componente na tela
+        setPlayers(rankingData);
+      } catch (err) {
+        console.error("❌ Erro ao buscar ranking:", err);
+        setError("Erro ao carregar o ranking. Tentando novamente...");
+
+        // Tenta novamente após 2 segundos em caso de erro
+        setTimeout(async () => {
+          try {
+            const rankingData = await ScoreService.getTop10Scores();
+            setPlayers(rankingData);
+            setError(null);
+          } catch (retryErr) {
+            console.error("❌ Erro na segunda tentativa:", retryErr);
+            setError("Não foi possível carregar o ranking.");
+          }
+        }, 2000);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    buscarRanking();
+  }, []);
+
+  const formatarTempo = (createdAt?: string) => {
+    if (!createdAt) return "--:--:--";
+
+    try {
+      const data = new Date(createdAt);
+      const agora = new Date();
+      const diffMs = agora.getTime() - data.getTime();
+      const diffHoras = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffMinutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      const diffSegundos = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+      if (diffHoras > 0) {
+        return `${diffHoras.toString().padStart(2, "0")}:${diffMinutos
+          .toString()
+          .padStart(2, "0")}:${diffSegundos.toString().padStart(2, "0")}`;
+      }
+      return `${diffMinutos.toString().padStart(2, "0")}:${diffSegundos
+        .toString()
+        .padStart(2, "0")}`;
+    } catch (error) {
+      return "--:--:--";
+    }
+  };
+
+  const handleBack = () => {
+    navigate("/home");
+  };
+
   return (
     <div className="ranking-wrapper">
-      {}
-         <button className="btn-voltar" onClick={() => navigate('/')}>
-        {}
+      <button className="btn-voltar" onClick={() => navigate("/")}>
         Voltar
       </button>
 
-      {/* Card principal */}
       <div className="ranking-container">
         <h1 className="ranking-title">Ranking</h1>
 
-        {/* Tabela visual do ranking com cabeçalho e jogadores */}
         <div className="ranking-table">
           <div className="ranking-header">
-            {/* Cabeçalhos das colunas: Nome e Pontuação */}
             <span>Nome</span>
             <span>Score</span>
           </div>
 
-          {/* Renderiza dinamicamente cada jogador da lista */}
-          {players.map((player, index) => (
-            <div className="ranking-row" key={index}>
-              {/* Nome do jogador */}
-              <div className="player-name">{player.name}</div>
-              {/* Pontuação*/}
-              <div className="player-score">
-                PONTOS: {player.score.toString().padStart(7, '0')} &nbsp;&nbsp;
-                TEMPO: {player.time}
-              </div>
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "2rem" }}>
+              <h3>🏆 Carregando ranking...</h3>
+              <p>Aguarde enquanto buscamos os melhores jogadores.</p>
             </div>
-          ))}
+          ) : error ? (
+            <div
+              style={{ textAlign: "center", padding: "2rem", color: "#e74c3c" }}
+            >
+              <h3>⚠️ {error}</h3>
+              <button
+                onClick={() => window.location.reload()}
+                style={{
+                  marginTop: "1rem",
+                  padding: "0.5rem 1rem",
+                  backgroundColor: "#3498db",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                🔄 Tentar Novamente
+              </button>
+            </div>
+          ) : players.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "2rem" }}>
+              <h3>🎮 Nenhum score encontrado</h3>
+              <p>Seja o primeiro a jogar e aparecer no ranking!</p>
+              <button
+                onClick={() => navigate("/jogo")}
+                style={{
+                  marginTop: "1rem",
+                  padding: "0.5rem 1rem",
+                  backgroundColor: "#27ae60",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                🎯 Jogar Agora
+              </button>
+            </div>
+          ) : (
+            players.map((player, index) => (
+              <div className="ranking-row" key={player.id || index}>
+                <div className="player-name">
+                  {index + 1}º {player.playerName}
+                </div>
+                <div className="player-score">
+                  PONTOS: {player.scoreValue.toString().padStart(6, "0")}{" "}
+                  &nbsp;&nbsp; TEMPO: {formatarTempo(player.createdAt)}
+                </div>
+              </div>
+            ))
+          )}
         </div>
+
+        {!loading && !error && players.length > 0 && (
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: "1rem",
+              fontSize: "0.9rem",
+              color: "#666",
+            }}
+          >
+            <p>🔄 Última atualização: {new Date().toLocaleTimeString()}</p>
+          </div>
+        )}
       </div>
     </div>
   );
