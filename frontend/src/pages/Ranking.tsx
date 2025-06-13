@@ -44,10 +44,6 @@ export const Ranking: React.FC = () => {
     buscarRanking();
   }, []);
 
-  const handleBack = () => {
-    navigate("/home");
-  };
-
   return (
     <div className="ranking-wrapper">
       <button className="btn-voltar" onClick={() => navigate("/")}>
