@@ -44,30 +44,6 @@ export const Ranking: React.FC = () => {
     buscarRanking();
   }, []);
 
-  const formatarTempo = (createdAt?: string) => {
-    if (!createdAt) return "--:--:--";
-
-    try {
-      const data = new Date(createdAt);
-      const agora = new Date();
-      const diffMs = agora.getTime() - data.getTime();
-      const diffHoras = Math.floor(diffMs / (1000 * 60 * 60));
-      const diffMinutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-      const diffSegundos = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-      if (diffHoras > 0) {
-        return `${diffHoras.toString().padStart(2, "0")}:${diffMinutos
-          .toString()
-          .padStart(2, "0")}:${diffSegundos.toString().padStart(2, "0")}`;
-      }
-      return `${diffMinutos.toString().padStart(2, "0")}:${diffSegundos
-        .toString()
-        .padStart(2, "0")}`;
-    } catch (error) {
-      return "--:--:--";
-    }
-  };
-
   const handleBack = () => {
     navigate("/home");
   };
@@ -138,8 +114,7 @@ export const Ranking: React.FC = () => {
                   {index + 1}º {player.playerName}
                 </div>
                 <div className="player-score">
-                  PONTOS: {player.scoreValue.toString().padStart(6, "0")}{" "}
-                  &nbsp;&nbsp; TEMPO: {formatarTempo(player.createdAt)}
+                  PONTOS: {player.scoreValue.toString().padStart(6, "0")}
                 </div>
               </div>
             ))
