@@ -3,9 +3,12 @@ import "./Ranking.css";
 import { useNavigate } from "react-router-dom";
 import { ScoreService } from "../services/scoreService";
 import { Score } from "../types/backend-types";
+import { useLanguage } from "../languageContext";
 
 export const Ranking: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+
   const [players, setPlayers] = useState<Score[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,9 +26,9 @@ export const Ranking: React.FC = () => {
         setPlayers(rankingData);
       } catch (err) {
         console.error("❌ Erro ao buscar ranking:", err);
-        setError("Erro ao carregar o ranking. Tentando novamente...");
+        setError(t("ranking", "loadError") || "Erro ao carregar o ranking.");
 
-        // Tenta novamente após 2 segundos em caso de erro
+        // Tentar novamente após 2 segundos
         setTimeout(async () => {
           try {
             const rankingData = await ScoreService.getTop10Scores();
@@ -33,7 +36,7 @@ export const Ranking: React.FC = () => {
             setError(null);
           } catch (retryErr) {
             console.error("❌ Erro na segunda tentativa:", retryErr);
-            setError("Não foi possível carregar o ranking.");
+            setError(t("ranking", "loadErrorPermanent") || "Não foi possível carregar o ranking.");
           }
         }, 2000);
       } finally {
@@ -42,32 +45,30 @@ export const Ranking: React.FC = () => {
     };
 
     buscarRanking();
-  }, []);
+  }, [t]);
 
   return (
     <div className="ranking-wrapper">
       <button className="btn-voltar" onClick={() => navigate("/")}>
-        Voltar
+        {t("difficulty", "back")}
       </button>
 
       <div className="ranking-container">
-        <h1 className="ranking-title">Ranking</h1>
+        <h1 className="ranking-title">{t("home", "ranking")}</h1>
 
         <div className="ranking-table">
           <div className="ranking-header">
-            <span>Nome</span>
-            <span>Score</span>
+            <span>{t("ranking", "name")}</span>
+            <span>{t("ranking", "points")}</span>
           </div>
 
           {loading ? (
             <div style={{ textAlign: "center", padding: "2rem" }}>
-              <h3>🏆 Carregando ranking...</h3>
-              <p>Aguarde enquanto buscamos os melhores jogadores.</p>
+              <h3>🏆 {t("ranking", "loading")}</h3>
+              <p>{t("ranking", "loadingMessage")}</p>
             </div>
           ) : error ? (
-            <div
-              style={{ textAlign: "center", padding: "2rem", color: "#e74c3c" }}
-            >
+            <div style={{ textAlign: "center", padding: "2rem", color: "#e74c3c" }}>
               <h3>⚠️ {error}</h3>
               <button
                 onClick={() => window.location.reload()}
@@ -81,13 +82,13 @@ export const Ranking: React.FC = () => {
                   cursor: "pointer",
                 }}
               >
-                🔄 Tentar Novamente
+                🔄 {t("ranking", "tryAgain") || "Tentar Novamente"}
               </button>
             </div>
           ) : players.length === 0 ? (
             <div style={{ textAlign: "center", padding: "2rem" }}>
-              <h3>🎮 Nenhum score encontrado</h3>
-              <p>Seja o primeiro a jogar e aparecer no ranking!</p>
+              <h3>🎮 {t("ranking", "noScores") || "Nenhum score encontrado"}</h3>
+              <p>{t("ranking", "beFirst") || "Seja o primeiro a jogar!"}</p>
               <button
                 onClick={() => navigate("/jogo")}
                 style={{
@@ -100,7 +101,7 @@ export const Ranking: React.FC = () => {
                   cursor: "pointer",
                 }}
               >
-                🎯 Jogar Agora
+                🎯 {t("home", "play")}
               </button>
             </div>
           ) : (
@@ -110,7 +111,7 @@ export const Ranking: React.FC = () => {
                   {index + 1}º {player.playerName}
                 </div>
                 <div className="player-score">
-                  PONTOS: {player.scoreValue.toString().padStart(6, "0")}
+                  {t("ranking", "points")}: {player.scoreValue.toString().padStart(6, "0")}
                 </div>
               </div>
             ))
@@ -126,7 +127,7 @@ export const Ranking: React.FC = () => {
               color: "#666",
             }}
           >
-            <p>🔄 Última atualização: {new Date().toLocaleTimeString()}</p>
+            <p>🔄 {t("ranking", "lastUpdate") || "Última atualização"}: {new Date().toLocaleTimeString()}</p>
           </div>
         )}
       </div>
