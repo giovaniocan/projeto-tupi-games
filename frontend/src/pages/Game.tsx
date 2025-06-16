@@ -8,13 +8,13 @@ import { CardService } from "../services/cardService";
 import { ScoreService } from "../services/scoreService";
 import { Card as BackendCard, Score } from "../types/backend-types";
 import { useLanguage } from "../languageContext";
-import translation from "../translation"; 
+import translation from "../translation";
 
 export const Game = () => {
   const { nivel } = useParams();
   const navigate = useNavigate();
-  const { language } = useLanguage(); 
-  const t = translation[language];    
+  const { language } = useLanguage();
+  const t = translation[language];
 
   const [mostrarScore, setMostrarScore] = useState(false);
 
@@ -27,28 +27,41 @@ export const Game = () => {
     par: number;
   }
 
+  // Estados do jogo
   const [cartas, setCartas] = useState<CartaJogoData[]>([]);
   const [cartasViradas, setCartasViradas] = useState<number[]>([]);
   const [tentativas, setTentativas] = useState<number>(0);
   const [pontuacao, setPontuacao] = useState<number>(1000);
   const [jogoCompleto, setJogoCompleto] = useState<boolean>(false);
   const [tempoJogo, setTempoJogo] = useState<number>(0);
+
+  // Estados para dados do backend
   const [ranking, setRanking] = useState<Score[]>([]);
   const [loadingCards, setLoadingCards] = useState<boolean>(true);
   const [loadingRanking, setLoadingRanking] = useState<boolean>(true);
 
+  // Configuração da dificuldade
   let numeroCartas = 30;
   const nivelNormalizado = (nivel || "").toLowerCase().trim();
-  if (nivelNormalizado === t.difficulty.easy.toLowerCase()) numeroCartas = 16;
-  else if (nivelNormalizado === t.difficulty.medium.toLowerCase()) numeroCartas = 24;
-  else if (nivelNormalizado === t.difficulty.hard.toLowerCase()) numeroCartas = 30;
+  if (nivelNormalizado === "fácil") {
+    numeroCartas = 16;
+  } else if (nivelNormalizado === "médio") {
+    numeroCartas = 24;
+  } else if (nivelNormalizado === "difícil") {
+    numeroCartas = 30;
+  }
 
+  // Buscar cartas do backend quando o componente carrega
   useEffect(() => {
     const buscarCartas = async () => {
       try {
         setLoadingCards(true);
+        console.log(`🎴 Buscando ${numeroCartas / 2} cartas...`);
+
+        // Chama o service diretamente
         const cartasBackend = await CardService.getCards(numeroCartas / 2);
 
+        // Criar pares de cartas (português + tupi)
         let todas = cartasBackend
           .flatMap((carta: BackendCard, idx: number) => [
             {
@@ -66,6 +79,7 @@ export const Game = () => {
           ])
           .sort(() => Math.random() - 0.5);
 
+        // Configurar estado das cartas
         const cartasEstado: CartaJogoData[] = todas.map((carta, idx) => ({
           id: idx,
           nome: carta.nome,
@@ -76,8 +90,9 @@ export const Game = () => {
         }));
 
         setCartas(cartasEstado);
+        console.log("✅ Cartas carregadas!");
       } catch (error) {
-        console.error("Erro ao buscar cartas:", error);
+        console.error("❌ Erro ao buscar cartas:", error);
       } finally {
         setLoadingCards(false);
       }
@@ -86,14 +101,20 @@ export const Game = () => {
     buscarCartas();
   }, [nivel, numeroCartas]);
 
+  // Buscar ranking do backend
   useEffect(() => {
     const buscarRanking = async () => {
       try {
         setLoadingRanking(true);
+        console.log("🏆 Buscando ranking...");
+
+        // Chama o service diretamente
         const rankingBackend = await ScoreService.getTop10Scores();
         setRanking(rankingBackend);
+
+        console.log("✅ Ranking carregado!");
       } catch (error) {
-        console.error("Erro ao buscar ranking:", error);
+        console.error("❌ Erro ao buscar ranking:", error);
       } finally {
         setLoadingRanking(false);
       }
@@ -102,6 +123,7 @@ export const Game = () => {
     buscarRanking();
   }, []);
 
+  // Reset do jogo quando muda nível
   useEffect(() => {
     setCartasViradas([]);
     setTentativas(0);
@@ -110,6 +132,7 @@ export const Game = () => {
     setTempoJogo(0);
   }, [nivel]);
 
+  // Timer do jogo
   useEffect(() => {
     if (jogoCompleto || loadingCards) return;
     const timer = setInterval(() => {
@@ -118,12 +141,21 @@ export const Game = () => {
     return () => clearInterval(timer);
   }, [jogoCompleto, loadingCards]);
 
+  // Mostrar modal de score quando jogo termina
   useEffect(() => {
-    if (jogoCompleto) setMostrarScore(true);
+    if (jogoCompleto) {
+      setMostrarScore(true);
+    }
   }, [jogoCompleto]);
 
+  // Lógica do jogo (não mudou)
   const virarCarta = (id: number) => {
-    if (cartasViradas.length === 2 || cartas[id].virada || cartas[id].encontrada) return;
+    if (
+      cartasViradas.length === 2 ||
+      cartas[id].virada ||
+      cartas[id].encontrada
+    )
+      return;
 
     const novasCartas = [...cartas];
     novasCartas[id].virada = true;
@@ -140,7 +172,10 @@ export const Game = () => {
   const verificarPar = (ids: number[]) => {
     const [id1, id2] = ids;
     const novasCartas = [...cartas];
-    if (novasCartas[id1].par === novasCartas[id2].par && novasCartas[id1].id !== novasCartas[id2].id) {
+    if (
+      novasCartas[id1].par === novasCartas[id2].par &&
+      novasCartas[id1].id !== novasCartas[id2].id
+    ) {
       novasCartas[id1].encontrada = true;
       novasCartas[id2].encontrada = true;
       setPontuacao((prev) => prev + 50);
@@ -160,6 +195,7 @@ export const Game = () => {
     return `${minutos}:${segundosRestantes}`;
   };
 
+  // Tela de loading
   if (loadingCards) {
     return (
       <div className="game-container">
@@ -184,6 +220,7 @@ export const Game = () => {
         {t.difficulty.back}
       </button>
       <div className="game-content">
+        {/* Tabuleiro do jogo */}
         <Card className={`game-board-container ${nivelNormalizado}`}>
           <div className={`game-board ${nivelNormalizado}`}>
             {cartas.map((carta, idx) => (
@@ -200,9 +237,9 @@ export const Game = () => {
           </div>
         </Card>
 
-        {/* Ranking */}
+        {/* Ranking lateral */}
         <Card className="game-ranking-container">
-          <h1 className="ranking-title">{t.home.ranking}</h1>
+          <h1 className="ranking-title">Ranking</h1>
           <div className="ranking-header">
             <div className="ranking-header-nome">{t.ranking.name}</div>
             <div className="ranking-header-pontos">{t.ranking.points}</div>
@@ -224,7 +261,7 @@ export const Game = () => {
         </Card>
       </div>
 
-      {/* Info */}
+      {/* Informações do jogo */}
       <div className="game-info">
         <Card className="tentativas">
           {t.game.try}s: {tentativas}
@@ -237,7 +274,7 @@ export const Game = () => {
         </Card>
       </div>
 
-      {/* Modal */}
+      {/* Modal de score */}
       {mostrarScore && (
         <ModelScore
           dificuldade={nivelNormalizado}
