@@ -14,7 +14,7 @@ const Instrucoes = () => {
       </button>
       <Card
         className="card-secundario"
-        title={t("instructions", "title") || "Instruções"}
+        title={t("home", "instructions")}
         subtitle={t("instructions", "text")}
         buttons={[]}
       />

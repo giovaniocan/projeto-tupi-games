@@ -54,7 +54,7 @@ export const Ranking: React.FC = () => {
       </button>
 
       <div className="ranking-container">
-        <h1 className="ranking-title">{t("home", "ranking")}</h1>
+      <h1 className="ranking-title">Ranking</h1>
 
         <div className="ranking-table">
           <div className="ranking-header">
